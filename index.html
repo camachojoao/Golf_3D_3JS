@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modular Mini Golf</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+                "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    
+    <div id="ui">
+        <h2>Mini Golf Engine</h2>
+        <p>Clica e arrasta para apontar e dar força.<br>Larga para atirar!</p>
+        <button id="resetBtn" style="margin-top: 10px; padding: 8px 15px; cursor: pointer; font-weight: bold; pointer-events: auto;">Reset Bola</button>    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
