@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modular Mini Golf</title>
+    <title>⛳ Mini Golf</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    
     <script type="importmap">
         {
             "imports": {
@@ -16,12 +17,107 @@
     </script>
 </head>
 <body>
-    
-    <div id="ui">
-        <h2>Mini Golf Engine</h2>
-        <p>Clica e arrasta para apontar e dar força.<br>Larga para atirar!</p>
-        <button id="resetBtn" style="margin-top: 10px; padding: 8px 15px; cursor: pointer; font-weight: bold; pointer-events: auto;">Reset Bola</button>    </div>
 
-    <script type="module" src="main.js"></script>
+<!-- ═══════════ MENU PRINCIPAL ═══════════ -->
+<div id="menu-screen">
+    <div class="menu-bg-gradient"></div>
+    <div class="menu-grass-strip"></div>
+
+    <div class="menu-content">
+        <header class="menu-header">
+            <div class="golf-flag">⛳</div>
+            <h1 class="game-title">MINI<span>GOLF</span></h1>
+            <p class="game-subtitle">Campo de São Luís</p>
+        </header>
+
+        <nav class="mode-cards">
+            <button class="mode-card" id="btn-training">
+                <span class="card-glyph">🏌️</span>
+                <div class="card-text">
+                    <strong>Treino Livre</strong>
+                    <span>Mapa aberto sem pontuação.<br>Explora e pratica à vontade.</span>
+                </div>
+                <span class="card-chevron">›</span>
+            </button>
+
+            <button class="mode-card card-featured" id="btn-course">
+                <div class="card-badge">MODO OFICIAL</div>
+                <span class="card-glyph">🏆</span>
+                <div class="card-text">
+                    <strong>Percurso Completo</strong>
+                    <span>5 Buracos · Par 16 · Eagle / Birdie / Bogey</span>
+                    <div class="hole-dots">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                    </div>
+                </div>
+                <span class="card-chevron">›</span>
+            </button>
+        </nav>
+
+        <p class="menu-controls">
+            <span>🖱 Arrasta para apontar e definir força</span>
+            <span>·</span>
+            <span>Botão direito roda a câmara</span>
+        </p>
+    </div>
+</div>
+
+<!-- ═══════════ JOGO ═══════════ -->
+<div id="game-screen" style="display:none">
+
+    <!-- HUD canto superior esquerdo -->
+    <div id="hud">
+        <div id="hud-hole" style="display:none">
+            <div id="hud-name">Buraco 1 · Linha Reta</div>
+            <div id="hud-row">
+                <span class="hud-lbl">Par</span><span id="hud-par" class="hud-val">2</span>
+                <span class="hud-sep">·</span>
+                <span class="hud-lbl">Jogadas</span><span id="hud-strokes" class="hud-val">0</span>
+            </div>
+        </div>
+        <div id="hud-training" style="display:none">🏌️&nbsp;Modo Treino</div>
+        <button id="resetBtn">↩ Reset</button>
+    </div>
+
+    <!-- Barra de força (direita) -->
+    <div id="power-wrap">
+        <div id="power-lbl">FORÇA</div>
+        <div id="power-track"><div id="power-fill"></div></div>
+    </div>
+
+    <!-- Overlay: buraco concluído -->
+    <div id="hole-end" style="display:none">
+        <div class="overlay-box">
+            <div class="hole-result-icon" id="he-icon">🦅</div>
+            <div class="hole-result-name" id="he-name">Eagle!</div>
+            <div class="hole-result-detail" id="he-detail">1 jogada · Par 2</div>
+            <button id="next-btn" class="overlay-btn">Próximo Buraco ›</button>
+        </div>
+    </div>
+
+    <!-- Overlay: cartão final -->
+    <div id="scorecard" style="display:none">
+        <div class="overlay-box scorecard-box">
+            <h2>🏆 Resultado Final</h2>
+            <table id="sc-table">
+                <thead>
+                    <tr><th>#</th><th>Buraco</th><th>Par</th><th>Jogadas</th><th></th></tr>
+                </thead>
+                <tbody id="sc-body"></tbody>
+                <tfoot>
+                    <tr id="sc-foot">
+                        <td colspan="3">TOTAL</td>
+                        <td id="sc-total-shots">—</td>
+                        <td id="sc-total-diff">—</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <button id="sc-menu-btn" class="overlay-btn" onclick="location.reload()">Menu Principal</button>
+        </div>
+    </div>
+
+</div>
+
+<script type="module" src="menu.js"></script>
 </body>
 </html>

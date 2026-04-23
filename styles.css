@@ -1,19 +1,420 @@
-/* Removes default browser margins and scrollbars */
-body { 
-    margin: 0; 
-    overflow: hidden; 
-    background-color: #87CEEB; /* Matches the 3D sky color */
-    font-family: sans-serif; 
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --green-dark:  #1a3a22;
+    --green-mid:   #2d6a3f;
+    --green-bright:#4CAF50;
+    --green-light: #7FD47A;
+    --gold:        #F5C842;
+    --clay:        #8D6E63;
+    --sky:         #87CEEB;
+    --panel:       rgba(8, 22, 12, 0.82);
+    --border:      rgba(127, 212, 122, 0.25);
+    --text:        #eef5ee;
+    --muted:       rgba(238,245,238,0.5);
 }
 
-/* The overlay instructions text */
-#ui {
-    position: absolute; 
-    top: 10px; 
-    left: 10px;
-    color: white; 
-    background: rgba(0,0,0,0.5);
-    padding: 10px; 
-    border-radius: 5px; 
-    pointer-events: none; /* Lets clicks pass through the text to the game */
+body {
+    overflow: hidden;
+    background: var(--sky);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
 }
+
+/* ══════════════════════════════════════════
+   MENU SCREEN
+══════════════════════════════════════════ */
+#menu-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    overflow: hidden;
+}
+
+.menu-bg-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(30,70,40,0.95) 0%, rgba(8,18,12,0.99) 100%);
+}
+
+.menu-grass-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, #1a3a22, transparent);
+}
+
+.menu-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 2rem;
+}
+
+/* Header / Logo */
+.menu-header { text-align: center; }
+
+.golf-flag {
+    font-size: 3.5rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(127,212,122,0.4));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+
+.game-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    color: var(--text);
+    text-shadow: 0 0 60px rgba(127,212,122,0.25);
+}
+
+.game-title span {
+    color: var(--green-light);
+    text-shadow: 0 0 40px rgba(127,212,122,0.5);
+}
+
+.game-subtitle {
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* Mode Cards */
+.mode-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(480px, 92vw);
+}
+
+.mode-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.3rem 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.22s ease;
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+}
+
+.mode-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(127,212,122,0.07) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.22s;
+}
+
+.mode-card:hover {
+    border-color: var(--green-light);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+
+.mode-card:hover::before { opacity: 1; }
+
+.card-featured {
+    border-color: rgba(127,212,122,0.45);
+    background: rgba(127,212,122,0.06);
+}
+
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    border: 1px solid rgba(245,200,66,0.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(245,200,66,0.07);
+}
+
+.card-glyph  { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
+.card-text   { flex: 1; }
+.card-text strong { display: block; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.card-text span   { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.card-chevron { font-size: 1.6rem; color: var(--green-light); opacity: 0.6; }
+
+.hole-dots {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.hole-dots span {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--green-light);
+    color: var(--green-light);
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.menu-controls {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   GAME SCREEN / HUD
+══════════════════════════════════════════ */
+#game-screen { position: fixed; inset: 0; }
+
+#hud {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+#hud-hole, #hud-training {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    backdrop-filter: blur(10px);
+}
+
+#hud-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--green-light);
+    letter-spacing: 0.03em;
+}
+
+#hud-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 0.82rem;
+}
+
+.hud-lbl { color: var(--muted); }
+.hud-val  { font-weight: 600; color: var(--text); }
+.hud-sep  { color: var(--muted); }
+
+#hud-training {
+    font-size: 0.88rem;
+    color: var(--green-light);
+    font-weight: 500;
+}
+
+#resetBtn {
+    pointer-events: auto;
+    align-self: flex-start;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 7px 13px;
+    font-size: 0.82rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.18s;
+}
+
+#resetBtn:hover {
+    background: rgba(127,212,122,0.12);
+    border-color: var(--green-light);
+}
+
+/* ── Power Bar ── */
+#power-wrap {
+    position: fixed;
+    right: 18px;
+    bottom: 36px;
+    width: 18px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 20;
+}
+
+#power-wrap.show { display: flex; }
+
+#power-lbl {
+    font-size: 0.52rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    margin-bottom: 6px;
+}
+
+#power-track {
+    width: 18px;
+    height: 140px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+#power-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, var(--green-bright), var(--gold), #F44336);
+    border-radius: 0 0 9px 9px;
+    transition: height 0.05s linear;
+}
+
+/* ══════════════════════════════════════════
+   OVERLAYS: Hole-end & Scorecard
+══════════════════════════════════════════ */
+#hole-end, #scorecard {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    background: rgba(4,12,6,0.80);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.overlay-box {
+    background: linear-gradient(160deg, rgba(20,45,25,0.98) 0%, rgba(10,25,14,0.98) 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2.5rem 3rem;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+.hole-result-icon { font-size: 3.5rem; line-height: 1; margin-bottom: 0.5rem; }
+.hole-result-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--green-light);
+    margin-bottom: 0.4rem;
+}
+.hole-result-detail {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 1.8rem;
+}
+
+.overlay-btn {
+    background: var(--green-mid);
+    border: 1px solid var(--green-light);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 11px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.18s;
+}
+
+.overlay-btn:hover {
+    background: #3a7a42;
+    transform: scale(1.04);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* Scorecard */
+.scorecard-box { min-width: min(500px, 92vw); padding: 2.5rem; }
+
+.scorecard-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: var(--green-light);
+    margin-bottom: 1.5rem;
+}
+
+#sc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.8rem;
+    font-size: 0.88rem;
+}
+
+#sc-table th, #sc-table td {
+    padding: 9px 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+#sc-table th {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+#sc-foot td {
+    font-weight: 700;
+    font-size: 1rem;
+    padding-top: 14px;
+    border: none;
+    color: var(--green-light);
+}
+
+.sc-eagle  { color: var(--gold);    font-weight: 700; }
+.sc-birdie { color: #6ad96a;        font-weight: 700; }
+.sc-par    { color: var(--text); }
+.sc-bogey  { color: #FF8A65; }
+.sc-double { color: #EF5350;        font-weight: 700; }
