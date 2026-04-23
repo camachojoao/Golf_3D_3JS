@@ -28,22 +28,17 @@ export function buildMap(scene, world, physicsMaterial, wallPhysicsMaterial, ram
         if (!invisible) meshesToUpdate.push({ mesh, body });
     }
 
-    // --- 1. O CHÃO VISUAL COM BURACO CIRCULAR (Muito leve para o CPU!) ---
+    // --- 1. CHÃO VISUAL COM PROPORÇÃO REAL (Coeficiente ~2.53) ---
     const floorShape = new THREE.Shape();
-    floorShape.moveTo(-10, -10); // Desenha o quadrado do mapa (20x20)
-    floorShape.lineTo(10, -10);
-    floorShape.lineTo(10, 10);
-    floorShape.lineTo(-10, 10);
-    floorShape.lineTo(-10, -10);
+    floorShape.moveTo(-10, -10); floorShape.lineTo(10, -10); floorShape.lineTo(10, 10); floorShape.lineTo(-10, 10); floorShape.lineTo(-10, -10);
 
-    const holeRadius = 1.2;
+    const holeRadius = 0.76; // NOVO: Tamanho proporcional à bola (0.3 * 2.53)
     const holePath = new THREE.Path();
-    holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false); // Desenha o círculo do buraco
-    floorShape.holes.push(holePath); // Corta o círculo do quadrado
+    holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false);
+    floorShape.holes.push(holePath);
 
-    const floorGeo = new THREE.ShapeGeometry(floorShape);
-    const floorVisual = new THREE.Mesh(floorGeo, floorMaterial);
-    floorVisual.rotation.x = -Math.PI / 2; // Deita o plano para o chão
+    const floorVisual = new THREE.Mesh(new THREE.ShapeGeometry(floorShape), floorMaterial);
+    floorVisual.rotation.x = -Math.PI / 2;
     floorVisual.receiveShadow = true;
     scene.add(floorVisual);
 
