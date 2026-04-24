@@ -4,8 +4,10 @@ import { buildMap } from './map.js';
 import { courseHoles } from './course.js';
 import { setupBall } from './ball.js';
 
+// Variável global para garantir que o jogo só arranca uma vez
 let isGameRunning = false;
 
+// Função principal que inicia o jogo (modo 'training' ou 'course')
 export function startGame(mode) {
     if (isGameRunning) return;
     isGameRunning = true;
@@ -26,7 +28,7 @@ export function startGame(mode) {
     let currentStartPos = new CANNON.Vec3(0, 5, 8); // Posição de respawn
     let scoreSheet = []; // Para guardar a pontuação final
 
-    // --- 1. SETUP ENGINE ---
+    // Configuração base do ambiente 3D (Cena, Câmara e Renderizador)
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB);
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -35,13 +37,14 @@ export function startGame(mode) {
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
+    // Adição de luz ambiente e luz direcional
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     // Colocamos o "Sol" um pouco mais alto para cobrir bem os níveis longos
     dirLight.position.set(15, 35, 15); 
     dirLight.castShadow = true;
 
-    // 1. Aumentar a área da câmara de sombras para cobrir 50x50 metros
+    // Ajustes da câmara de sombras para cobrir uma área grande de 50x50 metros
     dirLight.shadow.camera.left = -25;
     dirLight.shadow.camera.right = 25;
     dirLight.shadow.camera.top = 25;
@@ -49,18 +52,20 @@ export function startGame(mode) {
     dirLight.shadow.camera.near = 0.5;
     dirLight.shadow.camera.far = 100;
 
-    // 2. Aumentar a resolução (já que a área agora é enorme, precisamos de mais pixeis)
+    // Aumentar a resolução da sombra para manter a qualidade numa área grande
     dirLight.shadow.mapSize.width = 2048; 
     dirLight.shadow.mapSize.height = 2048;
 
-    // 3. Afinações de Bias para colar a sombra aos objetos e remover artefactos pretos nas faces
+    // Pequenos ajustes (Bias) para evitar falhas visuais (artefactos) nas sombras
     dirLight.shadow.bias = -0.0005;
     dirLight.shadow.normalBias = 0.02;
 
     scene.add(dirLight);
-    scene.add(dirLight);
 
+    // Criação do mundo físico com gravidade realista
     const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
+    
+    // Definição dos materiais e como eles reagem ao colidir (fricção e ressalto)
     const physMats = {
         physMat: new CANNON.Material('standard'),
         wallPhysMat: new CANNON.Material('wall'),
@@ -73,7 +78,7 @@ export function startGame(mode) {
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.wallPhysMat, { friction: 0.0, restitution: 0.6 }));
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.rampPhysMat, { friction: 0.0, restitution: 0.0 }));
 
-    // --- 2. SISTEMA DE BOLA E TACADAS ---
+    // Criação da bola e definição do que acontece após cada tacada
     const { ballMesh, ballBody } = setupBall(scene, world, physMats.physMat, camera, () => {
         if (!isHoleCompleted && currentMode === 'course') {
             currentStrokes++;
@@ -81,6 +86,7 @@ export function startGame(mode) {
         }
     });
 
+    // Função para repor a bola no ponto de partida se algo correr mal
     function resetBallPosition() {
         ballBody.position.copy(currentStartPos);
         ballBody.velocity.set(0,0,0);
@@ -89,7 +95,7 @@ export function startGame(mode) {
 
     document.getElementById('resetBtn').addEventListener('click', resetBallPosition);
 
-    // --- 3. GESTOR DE NÍVEIS ---
+    // Função para remover todos os blocos do nível anterior da memória e cena
     function clearCurrentLevel() {
         levelMeshes.forEach(({mesh, body}) => {
             if (mesh) scene.remove(mesh);
@@ -98,6 +104,7 @@ export function startGame(mode) {
         levelMeshes = [];
     }
 
+    // Função responsável por construir o nível pedido e repor pontuações
     function loadLevel(index) {
         clearCurrentLevel();
         currentStrokes = 0;
@@ -121,20 +128,20 @@ export function startGame(mode) {
     // Carrega o mapa inicial baseado no botão que foi clicado no Menu
     loadLevel(0);
 
-    // Botão "Próximo Buraco" no overlay
+    // Lógica do botão de avançar para o próximo buraco no final de cada nível
     nextBtn.addEventListener('click', () => {
         scoreSheet.push(currentStrokes); // Guarda a pontuação
         currentHoleIndex++;
         if (currentHoleIndex < courseHoles.length) {
             loadLevel(currentHoleIndex);
         } else {
-            // FIM DO JOGO: Mostra Scorecard (Podes ligar os dados do array scoreSheet à tabela aqui!)
+            // FIM DO JOGO: Mostra pontuação (ainda por fazer)
             overlayHoleEnd.style.display = 'none';
             document.getElementById('scorecard').style.display = 'flex';
         }
     });
 
-    // --- 4. CONTROLO DA CÂMARA ---
+    // Sistema de controlo de câmara (arrastar o botão direito)
     let cameraYaw = 0; let cameraPitch = Math.PI / 4; const camRadius = 12; 
     let isRightDragging = false; let prevMousePos = { x: 0, y: 0 };
     window.addEventListener('contextmenu', e => e.preventDefault());
@@ -148,23 +155,24 @@ export function startGame(mode) {
     });
     window.addEventListener('pointerup', e => { if (e.button === 2) isRightDragging = false; });
 
-    // --- 5. LOOP DE ANIMAÇÃO ---
+    // Relógio para calcular o tempo passado entre frames (delta)
     const clock = new THREE.Clock();
     
+    // Loop de animação que corre a cada frame
     function animate() {
         requestAnimationFrame(animate);
         
         // Limita o delta máximo para evitar bugs de física se o separador do browser ficar em 2º plano
         const delta = Math.min(clock.getDelta(), 0.05);
 
-        // O passo da física agora é mais consistente
+        // Atualiza o motor de física com um passo de tempo fixo
         world.step(1 / 60, delta, 3);
 
-        // Sincroniza a Bola
+        // Sincroniza a posição da mesh 3D da bola com o corpo físico invisível
         ballMesh.position.copy(ballBody.position);
         ballMesh.quaternion.copy(ballBody.quaternion);
         
-        // Sincroniza os restantes objetos (apenas se eles se pudessem mover, mas não faz mal manter)
+        // Sincroniza também as posições dos obstáculos (caso se movessem)
         levelMeshes.forEach(({mesh, body}) => {
             if (mesh && body) { 
                 mesh.position.copy(body.position); 
@@ -172,7 +180,7 @@ export function startGame(mode) {
             }
         });
 
-        // Lógica de Vitória...
+        // Verifica se a bola caiu dentro da área do buraco e aciona a vitória
         if (currentMode === 'course' && !isHoleCompleted) {
             const hole = courseHoles[currentHoleIndex];
             const distXZ = Math.sqrt(Math.pow(ballMesh.position.x - hole.holePos.x, 2) + Math.pow(ballMesh.position.z - hole.holePos.z, 2));
@@ -180,6 +188,7 @@ export function startGame(mode) {
             if (distXZ < hole.holeRadius && ballMesh.position.y < (hole.holePos.y + 1)) {
                 isHoleCompleted = true;
                 
+                // Lógica de cálculo da pontuação (Eagle, Birdie, Par, etc.) com base nas jogadas
                 let diff = currentStrokes - hole.par;
                 let resultName = "Par"; let resultIcon = "⛳";
                 if (diff <= -2) { resultName = "Eagle!"; resultIcon = "🦅"; }
@@ -195,7 +204,7 @@ export function startGame(mode) {
             }
         }
 
-        // CÂMARA: Matemática suave independente do Framerate
+        // Cálculo e movimentação suave da câmara para seguir a bola de forma fluida
         const targetCamPos = new THREE.Vector3(
             ballMesh.position.x + camRadius * Math.cos(cameraPitch) * Math.sin(cameraYaw),
             ballMesh.position.y + camRadius * Math.sin(cameraPitch),

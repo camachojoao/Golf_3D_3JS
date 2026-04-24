@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Import Map para simplificar a importação de módulos JS (Three.js e Cannon-es) -->
     <script type="importmap">
         {
             "imports": {
@@ -20,9 +21,11 @@
 
 <!-- ═══════════ MENU PRINCIPAL ═══════════ -->
 <div id="menu-screen">
+    <!-- Elementos visuais de fundo para o menu -->
     <div class="menu-bg-gradient"></div>
     <div class="menu-grass-strip"></div>
 
+    <!-- Conteúdo principal do menu (título, botões, etc...) -->
     <div class="menu-content">
         <header class="menu-header">
             <div class="golf-flag">⛳</div>
@@ -30,6 +33,7 @@
             <p class="game-subtitle">Campo de São Luís</p>
         </header>
 
+        <!-- Navegação com os botões de modo de jogo -->
         <nav class="mode-cards">
             <button class="mode-card" id="btn-training">
                 <span class="card-glyph">🏌️</span>
@@ -54,6 +58,7 @@
             </button>
         </nav>
 
+        <!-- Texto com os controlos básicos do jogo -->
         <p class="menu-controls">
             <span>🖱 Arrasta para apontar e definir força</span>
             <span>·</span>
@@ -65,8 +70,9 @@
 <!-- ═══════════ JOGO ═══════════ -->
 <div id="game-screen" style="display:none">
 
-    <!-- HUD canto superior esquerdo -->
+    <!-- HUD com informações do jogo -->
     <div id="hud">
+        <!-- Painel de informações para o modo Percurso -->
         <div id="hud-hole" style="display:none">
             <div id="hud-name">Buraco 1 · Linha Reta</div>
             <div id="hud-row">
@@ -75,17 +81,19 @@
                 <span class="hud-lbl">Jogadas</span><span id="hud-strokes" class="hud-val">0</span>
             </div>
         </div>
+        <!-- Painel de informações para o modo Treino -->
         <div id="hud-training" style="display:none">🏌️&nbsp;Modo Treino</div>
-        <button id="resetBtn">↩ Reset</button>
+        <!-- Botão para reposicionar a bola no início -->
+        <button id="resetBtn">↩ Repor</button>
     </div>
 
-    <!-- Barra de força (direita) -->
+    <!-- Barra de força visual da tacada -->
     <div id="power-wrap">
         <div id="power-lbl">FORÇA</div>
         <div id="power-track"><div id="power-fill"></div></div>
     </div>
 
-    <!-- Overlay: buraco concluído -->
+    <!-- Overlay que aparece ao completar um buraco -->
     <div id="hole-end" style="display:none">
         <div class="overlay-box">
             <div class="hole-result-icon" id="he-icon">🦅</div>
@@ -95,7 +103,7 @@
         </div>
     </div>
 
-    <!-- Overlay: cartão final -->
+    <!-- Overlay com a tabela de pontuação final -->
     <div id="scorecard" style="display:none">
         <div class="overlay-box scorecard-box">
             <h2>🏆 Resultado Final</h2>
@@ -103,8 +111,10 @@
                 <thead>
                     <tr><th>#</th><th>Buraco</th><th>Par</th><th>Jogadas</th><th></th></tr>
                 </thead>
-                <tbody id="sc-body"></tbody>
+                <!-- O corpo da tabela será preenchido dinamicamente via JS -->
+                <tbody id="sc-body"></tbody> 
                 <tfoot>
+                    <!-- O rodapé da tabela com os totais -->
                     <tr id="sc-foot">
                         <td colspan="3">TOTAL</td>
                         <td id="sc-total-shots">—</td>
@@ -112,12 +122,14 @@
                     </tr>
                 </tfoot>
             </table>
+            <!-- Botão para recarregar a página e voltar ao menu -->
             <button id="sc-menu-btn" class="overlay-btn" onclick="location.reload()">Menu Principal</button>
         </div>
     </div>
 
 </div>
 
+<!-- Script principal que inicializa a lógica do menu -->
 <script type="module" src="menu.js"></script>
 </body>
 </html>

@@ -1,4 +1,6 @@
-/* ── Reset ── */
+/* ══════════════════════════════════════════
+   1. RESET & ESTILOS BASE
+══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -23,7 +25,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   MENU SCREEN
+   2. MENU
 ══════════════════════════════════════════ */
 #menu-screen {
     position: fixed;
@@ -61,7 +63,7 @@ body {
     padding: 2rem;
 }
 
-/* Header / Logo */
+/* ── 2.1 Header & Logo ── */
 .menu-header { text-align: center; }
 
 .golf-flag {
@@ -99,7 +101,7 @@ body {
     color: var(--muted);
 }
 
-/* Mode Cards */
+/* ── 2.2 Cartões de Modo ── */
 .mode-cards {
     display: flex;
     flex-direction: column;
@@ -195,7 +197,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   GAME SCREEN / HUD
+   3. ECRÃ DE JOGO & HUD
 ══════════════════════════════════════════ */
 #game-screen { position: fixed; inset: 0; }
 
@@ -263,7 +265,7 @@ body {
     border-color: var(--green-light);
 }
 
-/* ── Power Bar ── */
+/* ── 3.1 Barra de Força ── */
 #power-wrap {
     position: fixed;
     right: 18px;
@@ -309,8 +311,10 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   OVERLAYS: Hole-end & Scorecard
+   4. OVERLAYS & MODALS
 ══════════════════════════════════════════ */
+
+/* ── 4.1 Ecrã de Fim de Buraco ── */
 #hole-end, #scorecard {
     position: fixed;
     inset: 0;
@@ -374,7 +378,7 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
-/* Scorecard */
+/* ── 4.2 Tabela de Pontuação ── */
 .scorecard-box { min-width: min(500px, 92vw); padding: 2.5rem; }
 
 .scorecard-box h2 {
