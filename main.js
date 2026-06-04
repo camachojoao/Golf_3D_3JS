@@ -75,7 +75,7 @@ export function startGame(mode) {
         cupMat: new THREE.MeshStandardMaterial({ color: 0x111111 })
     };
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.physMat, { friction: 0.8, restitution: 0.3 }));
-    world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.wallPhysMat, { friction: 0.0, restitution: 0.6 }));
+    world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.wallPhysMat, { friction: 0.0, restitution: 0.8 }));
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.rampPhysMat, { friction: 0.0, restitution: 0.0 }));
 
     // Criação da bola e definição do que acontece após cada tacada
@@ -88,6 +88,8 @@ export function startGame(mode) {
 
     // Função para repor a bola no ponto de partida se algo correr mal
     function resetBallPosition() {
+        ballBody.mass = 1; // Devolvemos a massa para "descongelar" a bola para o próximo nível
+        ballBody.updateMassProperties();
         ballBody.position.copy(currentStartPos);
         ballBody.velocity.set(0,0,0);
         ballBody.angularVelocity.set(0,0,0);
@@ -135,8 +137,38 @@ export function startGame(mode) {
         if (currentHoleIndex < courseHoles.length) {
             loadLevel(currentHoleIndex);
         } else {
-            // FIM DO JOGO: Mostra pontuação (ainda por fazer)
             overlayHoleEnd.style.display = 'none';
+            
+            // Preencher a tabela de pontuação final (Scorecard) dinamicamente
+            const scBody = document.getElementById('sc-body');
+            scBody.innerHTML = ''; // Limpar tabela (precaução)
+            
+            let totalPar = 0;
+            let totalShots = 0;
+
+            courseHoles.forEach((hole, i) => {
+                const strokes = scoreSheet[i];
+                const diff = strokes - hole.par;
+                
+                totalPar += hole.par;
+                totalShots += strokes;
+
+                let resName = "Par"; let scClass = "sc-par"; let diffTxt = "E";
+                if (diff <= -2) { resName = "Eagle"; scClass = "sc-eagle"; diffTxt = diff; }
+                else if (diff === -1) { resName = "Birdie"; scClass = "sc-birdie"; diffTxt = diff; }
+                else if (diff === 1) { resName = "Bogey"; scClass = "sc-bogey"; diffTxt = "+" + diff; }
+                else if (diff >= 2) { resName = "Double Bogey"; scClass = "sc-double"; diffTxt = "+" + diff; }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${i + 1}</td><td>${hole.name}</td><td>${hole.par}</td><td>${strokes}</td><td class="${scClass}">${resName} (${diffTxt})</td>`;
+                scBody.appendChild(row);
+            });
+
+            // Cálculo do rodapé (Total de tacadas e a diferença total perante o par do campo)
+            const totalDiff = totalShots - totalPar;
+            document.getElementById('sc-total-shots').innerText = totalShots;
+            document.getElementById('sc-total-diff').innerText = totalDiff === 0 ? "E" : (totalDiff > 0 ? "+" + totalDiff : totalDiff);
+
             document.getElementById('scorecard').style.display = 'flex';
         }
     });
@@ -188,6 +220,13 @@ export function startGame(mode) {
             if (distXZ < hole.holeRadius && ballMesh.position.y < (hole.holePos.y + 1)) {
                 isHoleCompleted = true;
                 
+                // FIX: Congelamos a bola totalmente no exato momento que ganha. 
+                // Impede qualquer movimento estranho ou glitch no interior apertado do copo!
+                ballBody.velocity.set(0, 0, 0);
+                ballBody.angularVelocity.set(0, 0, 0);
+                ballBody.mass = 0; 
+                ballBody.updateMassProperties();
+
                 // Lógica de cálculo da pontuação (Eagle, Birdie, Par, etc.) com base nas jogadas
                 let diff = currentStrokes - hole.par;
                 let resultName = "Par"; let resultIcon = "⛳";

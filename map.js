@@ -47,13 +47,21 @@ export function buildMap(scene, world, physicsMaterial, wallPhysicsMaterial, ram
     scene.add(floorVisual);
 
     // Física do chão (colisões com a bola)
-    createBox(20, 1, 8.8,   0, -0.5, -5.6, floorMaterial, 0, 0, physicsMaterial, true); // Norte
-    createBox(20, 1, 8.8,   0, -0.5,  5.6, floorMaterial, 0, 0, physicsMaterial, true); // Sul
-    createBox(8.8, 1, 2.4, -5.6, -0.5,   0, floorMaterial, 0, 0, physicsMaterial, true); // Oeste
-    createBox(8.8, 1, 2.4,  5.6, -0.5,   0, floorMaterial, 0, 0, physicsMaterial, true); // Este
+    // O buraco físico será um quadrado calculado dinamicamente face ao buraco visual.
+    // Usamos o fator de 0.9 (pRadius) para garantir um cair suave e sem ressaltos.
+    const pRadius = holeRadius * 0.9;
+    const depthZ = 10 - pRadius;
+    const posZ = 5 + pRadius / 2;
+    const widthX = 10 - pRadius;
+    const posX = 5 + pRadius / 2;
+
+    createBox(20, 1, depthZ,   0, -0.5, -posZ, floorMaterial, 0, 0, physicsMaterial, true); // Norte
+    createBox(20, 1, depthZ,   0, -0.5,  posZ, floorMaterial, 0, 0, physicsMaterial, true); // Sul
+    createBox(widthX, 1, pRadius * 2, -posX, -0.5,   0, floorMaterial, 0, 0, physicsMaterial, true); // Oeste
+    createBox(widthX, 1, pRadius * 2,  posX, -0.5,   0, floorMaterial, 0, 0, physicsMaterial, true); // Este
 
     // Caixa debaixo do buraco para apanhar a bola e fazer o buraco parecer uma "cova"
-    createBox(2.4, 0.2, 2.4, 0, -1.5, 0, holeMaterial);
+    createBox(holeRadius * 2, 0.2, holeRadius * 2, 0, -1.5, 0, holeMaterial);
 
     // Criação das paredes (atualizado para não terem fricção que antes bugava a bola a passar rasteira)
     createBox(20, 2, 1,    0, 0.5, -10.5, wallMaterial, 0, 0, wallPhysicsMaterial); 
