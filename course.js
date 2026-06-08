@@ -74,6 +74,7 @@ function buildLevelLayout(scene, world, mats, levelMeshes, width, depth, holeX, 
     const flagMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.4 });
     const flagMesh = new THREE.Mesh(flagGeom, flagMat);
     flagMesh.position.set(holeX, 3.9, holeZ - 0.01); // Centrado no topo do mastro
+    flagMesh.name = "holeFlag";
     flagMesh.castShadow = true;
     scene.add(flagMesh);
     levelMeshes.push({ mesh: flagMesh, body: null });

@@ -21,6 +21,9 @@
 
 <!-- ═══════════ MENU PRINCIPAL ═══════════ -->
 <div id="menu-screen">
+    <!-- Botão de fechar (Apenas visível se for aberto a meio do jogo) -->
+    <button id="close-menu-btn" class="close-btn" style="display:none">✕</button>
+
     <!-- Elementos visuais de fundo para o menu -->
     <div class="menu-bg-gradient"></div>
     <div class="menu-grass-strip"></div>
@@ -83,8 +86,11 @@
         </div>
         <!-- Painel de informações para o modo Treino -->
         <div id="hud-training" style="display:none">🏌️&nbsp;Modo Treino</div>
-        <!-- Botão para reposicionar a bola no início -->
-        <button id="resetBtn">↩ Repor</button>
+        <!-- Botões de ação do jogo -->
+        <div class="hud-actions">
+            <button id="menuBtn">☰ Menu</button>
+            <button id="resetBtn">↩ Repor</button>
+        </div>
     </div>
 
     <!-- Barra de força visual da tacada -->

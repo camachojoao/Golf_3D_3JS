@@ -91,6 +91,7 @@ export function buildMap(scene, world, physicsMaterial, wallPhysicsMaterial, ram
     const flagMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.4 });
     const flagMesh = new THREE.Mesh(flagGeom, flagMat);
     flagMesh.position.set(0, 3.9, -0.01); 
+    flagMesh.name = "holeFlag";
     flagMesh.castShadow = true;
     scene.add(flagMesh);
     meshesToUpdate.push({ mesh: flagMesh, body: null });

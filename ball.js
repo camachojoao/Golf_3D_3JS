@@ -38,7 +38,8 @@ export function setupBall(scene, world, physicsMaterial, camera, onShotCallback)
 
     // Lógica ao pressionar o botão esquerdo do rato (tacada)
     window.addEventListener('pointerdown', (e) => {
-        if (e.button !== 0 || e.target.id === 'resetBtn' || e.target.closest('.overlay-btn')) return;
+        // Ignora qualquer clique que não seja feito diretamente no mundo 3D (ex: menus, botões, UI)
+        if (e.button !== 0 || e.target.tagName !== 'CANVAS') return;
         if (ballBody.velocity.length() > 0.5) return; // Só permite jogar se a bola estiver (quase) parada
         
         isDragging = true;

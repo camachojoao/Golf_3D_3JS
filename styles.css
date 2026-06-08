@@ -199,7 +199,7 @@ body {
 /* ══════════════════════════════════════════
    3. ECRÃ DE JOGO & HUD
 ══════════════════════════════════════════ */
-#game-screen { position: fixed; inset: 0; }
+#game-screen { position: fixed; inset: 0; pointer-events: none; }
 
 #hud {
     position: fixed;
@@ -245,9 +245,14 @@ body {
     font-weight: 500;
 }
 
-#resetBtn {
+.hud-actions {
     pointer-events: auto;
     align-self: flex-start;
+    display: flex;
+    gap: 8px;
+}
+
+#resetBtn, #menuBtn {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -260,9 +265,33 @@ body {
     transition: all 0.18s;
 }
 
-#resetBtn:hover {
+#resetBtn:hover, #menuBtn:hover {
     background: rgba(127,212,122,0.12);
     border-color: var(--green-light);
+}
+
+/* ── Botão Fechar Menu ── */
+.close-btn {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+    font-size: 1.2rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.1);
 }
 
 /* ── 3.1 Barra de Força ── */
@@ -325,6 +354,7 @@ body {
     background: rgba(4,12,6,0.80);
     backdrop-filter: blur(6px);
     animation: fadeIn 0.3s ease;
+    pointer-events: auto;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

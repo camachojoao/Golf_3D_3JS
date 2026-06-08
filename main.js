@@ -93,6 +93,11 @@ export function startGame(mode) {
         ballBody.position.copy(currentStartPos);
         ballBody.velocity.set(0,0,0);
         ballBody.angularVelocity.set(0,0,0);
+        isHoleCompleted = false; // Reset da variável de vitória para novo treino/nível
+
+        // Repor a bandeira na sua rotação inicial
+        const flag = scene.getObjectByName("holeFlag");
+        if (flag) flag.rotation.y = 0;
     }
 
     document.getElementById('resetBtn').addEventListener('click', resetBallPosition);
@@ -213,11 +218,22 @@ export function startGame(mode) {
         });
 
         // Verifica se a bola caiu dentro da área do buraco e aciona a vitória
-        if (currentMode === 'course' && !isHoleCompleted) {
-            const hole = courseHoles[currentHoleIndex];
-            const distXZ = Math.sqrt(Math.pow(ballMesh.position.x - hole.holePos.x, 2) + Math.pow(ballMesh.position.z - hole.holePos.z, 2));
+        if (!isHoleCompleted) {
+            let targetPos, targetRadius;
+
+            if (currentMode === 'course') {
+                const hole = courseHoles[currentHoleIndex];
+                targetPos = hole.holePos;
+                targetRadius = hole.holeRadius;
+            } else {
+                // Modo Treino (o buraco está na origem) com o sensor aumentado (ex: 1.5x maior)
+                targetPos = { x: 0, y: -1.5, z: 0 };
+                targetRadius = 0.76 * 1.5; 
+            }
+
+            const distXZ = Math.sqrt(Math.pow(ballMesh.position.x - targetPos.x, 2) + Math.pow(ballMesh.position.z - targetPos.z, 2));
             
-            if (distXZ < hole.holeRadius && ballMesh.position.y < (hole.holePos.y + 1.2)) {
+            if (distXZ < targetRadius && ballMesh.position.y < (targetPos.y + 1.2)) {
                 isHoleCompleted = true;
                 
                 // FIX: Congelamos a bola totalmente no exato momento que ganha. 
@@ -227,19 +243,32 @@ export function startGame(mode) {
                 ballBody.mass = 0; 
                 ballBody.updateMassProperties();
 
-                // Lógica de cálculo da pontuação (Eagle, Birdie, Par, etc.) com base nas jogadas
-                let diff = currentStrokes - hole.par;
-                let resultName = "Par"; let resultIcon = "⛳";
-                if (diff <= -2) { resultName = "Eagle!"; resultIcon = "🦅"; }
-                else if (diff === -1) { resultName = "Birdie!"; resultIcon = "🐦"; }
-                else if (diff === 1) { resultName = "Bogey"; resultIcon = "⚠️"; }
-                else if (diff >= 2) { resultName = "Double Bogey"; resultIcon = "☠️"; }
-                
-                document.getElementById('he-icon').innerText = resultIcon;
-                document.getElementById('he-name').innerText = resultName;
-                document.getElementById('he-detail').innerText = `${currentStrokes} jogadas · Par ${hole.par}`;
-                
-                overlayHoleEnd.style.display = 'flex';
+                if (currentMode === 'course') {
+                    const hole = courseHoles[currentHoleIndex];
+                    // Lógica de cálculo da pontuação (Eagle, Birdie, Par, etc.) com base nas jogadas
+                    let diff = currentStrokes - hole.par;
+                    let resultName = "Par"; let resultIcon = "⛳";
+                    if (diff <= -2) { resultName = "Eagle!"; resultIcon = "🦅"; }
+                    else if (diff === -1) { resultName = "Birdie!"; resultIcon = "🐦"; }
+                    else if (diff === 1) { resultName = "Bogey"; resultIcon = "⚠️"; }
+                    else if (diff >= 2) { resultName = "Double Bogey"; resultIcon = "☠️"; }
+                    
+                    document.getElementById('he-icon').innerText = resultIcon;
+                    document.getElementById('he-name').innerText = resultName;
+                    document.getElementById('he-detail').innerText = `${currentStrokes} jogadas · Par ${hole.par}`;
+                    
+                    overlayHoleEnd.style.display = 'flex';
+                }
+            }
+        }
+
+        // Anima a bandeira a girar de forma festiva quando o buraco é concluído
+        if (isHoleCompleted) {
+            const flag = scene.getObjectByName("holeFlag");
+            // Roda apenas até perfazer 2 voltas completas (4 * Pi)
+            if (flag && flag.rotation.y < Math.PI * 4) {
+                flag.rotation.y += 8 * delta;
+                if (flag.rotation.y > Math.PI * 4) flag.rotation.y = Math.PI * 4; 
             }
         }
 
