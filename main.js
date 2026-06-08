@@ -72,7 +72,7 @@ export function startGame(mode) {
         rampPhysMat: new CANNON.Material('ramp'),
         floorMat: new THREE.MeshStandardMaterial({ color: 0x4CAF50, side: THREE.DoubleSide }),
         wallMat: new THREE.MeshStandardMaterial({ color: 0x8D6E63 }),
-        cupMat: new THREE.MeshStandardMaterial({ color: 0x111111 })
+        cupMat: new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.DoubleSide })
     };
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.physMat, { friction: 0.8, restitution: 0.3 }));
     world.addContactMaterial(new CANNON.ContactMaterial(physMats.physMat, physMats.wallPhysMat, { friction: 0.0, restitution: 0.8 }));
@@ -217,7 +217,7 @@ export function startGame(mode) {
             const hole = courseHoles[currentHoleIndex];
             const distXZ = Math.sqrt(Math.pow(ballMesh.position.x - hole.holePos.x, 2) + Math.pow(ballMesh.position.z - hole.holePos.z, 2));
             
-            if (distXZ < hole.holeRadius && ballMesh.position.y < (hole.holePos.y + 1)) {
+            if (distXZ < hole.holeRadius && ballMesh.position.y < (hole.holePos.y + 1.2)) {
                 isHoleCompleted = true;
                 
                 // FIX: Congelamos a bola totalmente no exato momento que ganha. 

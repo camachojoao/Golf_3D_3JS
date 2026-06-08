@@ -61,7 +61,7 @@ export function buildMap(scene, world, physicsMaterial, wallPhysicsMaterial, ram
     createBox(widthX, 1, pRadius * 2,  posX, -0.5,   0, floorMaterial, 0, 0, physicsMaterial, true); // Este
 
     // Caixa debaixo do buraco para apanhar a bola e fazer o buraco parecer uma "cova"
-    createBox(holeRadius * 2, 0.2, holeRadius * 2, 0, -1.5, 0, holeMaterial);
+    createBox(holeRadius * 2, 1.5, holeRadius * 2, 0, -1.5, 0, holeMaterial);
 
     // Criação das paredes (atualizado para não terem fricção que antes bugava a bola a passar rasteira)
     createBox(20, 2, 1,    0, 0.5, -10.5, wallMaterial, 0, 0, wallPhysicsMaterial); 
@@ -71,4 +71,27 @@ export function buildMap(scene, world, physicsMaterial, wallPhysicsMaterial, ram
 
     // Rampa para testar físicas verticais e porque é fixe
     createBox(4, 0.1, 8, -5, 0.3, -6, floorMaterial, 0, -Math.PI / 8, rampPhysicsMaterial);
+
+    // Mastro da Bandeira no buraco de treino (Apenas Visual)
+    const poleGeom = new THREE.CylinderGeometry(0.04, 0.04, 4, 16);
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.3 });
+    const poleMesh = new THREE.Mesh(poleGeom, poleMat);
+    poleMesh.position.set(0, 2, 0); // Buraco no map.js está em x=0, z=0
+    poleMesh.castShadow = true;
+    scene.add(poleMesh);
+    meshesToUpdate.push({ mesh: poleMesh, body: null });
+
+    // Pano da Bandeira (Triângulo vermelho)
+    const flagShape = new THREE.Shape();
+    flagShape.moveTo(0, 0);
+    flagShape.lineTo(1.2, -0.35); 
+    flagShape.lineTo(0, -0.7);
+    flagShape.lineTo(0, 0);
+    const flagGeom = new THREE.ExtrudeGeometry(flagShape, { depth: 0.02, bevelEnabled: false });
+    const flagMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.4 });
+    const flagMesh = new THREE.Mesh(flagGeom, flagMat);
+    flagMesh.position.set(0, 3.9, -0.01); 
+    flagMesh.castShadow = true;
+    scene.add(flagMesh);
+    meshesToUpdate.push({ mesh: flagMesh, body: null });
 }

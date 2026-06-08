@@ -46,20 +46,37 @@ function buildLevelLayout(scene, world, mats, levelMeshes, width, depth, holeX, 
 
     // Fundo do Buraco (caixa) onde a bola cai e repousa
     const cupBody = new CANNON.Body({ mass: 0, material: physMat });
-    cupBody.addShape(new CANNON.Box(new CANNON.Vec3(holeRadius, 0.25, holeRadius)));
+    cupBody.addShape(new CANNON.Box(new CANNON.Vec3(holeRadius, 1.5 / 2, holeRadius)));
     cupBody.position.set(holeX, -1.5, holeZ); 
     world.addBody(cupBody);
     
-    // Fundo do Buraco (Apenas Visual!)
-    // Removemos TODA a física do interior do buraco. A bola vai cair no vazio absoluto,
-    // o que garante que nunca haverá atrito ou colisões estranhas lá dentro.
-    // O jogo "congela" a bola a meio da queda graças ao código no main.js, criando a ilusão perfeita!
-    const cupMesh = new THREE.Mesh(new THREE.BoxGeometry(holeRadius*2, 0.5, holeRadius*2), cupMat);
+    const cupMesh = new THREE.Mesh(new THREE.BoxGeometry(holeRadius * 2, 1.5, holeRadius * 2), cupMat);
     cupMesh.position.copy(cupBody.position);
-    cupMesh.position.set(holeX, -1.5, holeZ);
     scene.add(cupMesh);
     levelMeshes.push({ mesh: cupMesh, body: cupBody });
-    levelMeshes.push({ mesh: cupMesh, body: null });
+
+    // Mastro da Bandeira (Apenas Visual)
+    const poleGeom = new THREE.CylinderGeometry(0.04, 0.04, 4, 16);
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.3 });
+    const poleMesh = new THREE.Mesh(poleGeom, poleMat);
+    poleMesh.position.set(holeX, 2, holeZ); // Base no chão (y=0) e sobe até y=4
+    poleMesh.castShadow = true;
+    scene.add(poleMesh);
+    levelMeshes.push({ mesh: poleMesh, body: null });
+
+    // Pano da Bandeira (Triângulo vermelho)
+    const flagShape = new THREE.Shape();
+    flagShape.moveTo(0, 0);
+    flagShape.lineTo(1.2, -0.35); // Bico do triângulo apontado para o lado
+    flagShape.lineTo(0, -0.7);
+    flagShape.lineTo(0, 0);
+    const flagGeom = new THREE.ExtrudeGeometry(flagShape, { depth: 0.02, bevelEnabled: false });
+    const flagMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.4 });
+    const flagMesh = new THREE.Mesh(flagGeom, flagMat);
+    flagMesh.position.set(holeX, 3.9, holeZ - 0.01); // Centrado no topo do mastro
+    flagMesh.castShadow = true;
+    scene.add(flagMesh);
+    levelMeshes.push({ mesh: flagMesh, body: null });
 }
 
 // Lógica auxiliar para construir as paredes e obstáculos 
